@@ -15,6 +15,7 @@ resize_after_id = None
 alpha_values = [0.4, 0.9, 1.0]
 current_alpha_index = 1
 lines_drawn = []
+undone_lines = []
 
 def _stop_draw(event):
     global previous_point
@@ -35,13 +36,13 @@ def _draw(event, size = -1, color = -1):
 
     
     if previous_point != [0,0]:
-        #canvas.create_oval(x - 4, y - 4, x + 4, y + 4, fill='black')
         line_id = canvas.create_line(previous_point[0],previous_point[1],current_point[0],current_point[1], 
                            fill=color, width=size, capstyle=tk.ROUND, joinstyle=tk.ROUND, smooth=True)
     else:
         line_id  = canvas.create_line(current_point[0],current_point[1],current_point[0],current_point[1], 
                            fill=color, width=size, capstyle=tk.ROUND, joinstyle=tk.ROUND, smooth=True)
-    lines_drawn.append(line_id)
+        lines_drawn.append([])
+    lines_drawn[len(lines_drawn)-1].append(line_id)
     
     previous_point = current_point
 
@@ -55,7 +56,11 @@ def _toggle_alpha(event):
 def _clear_canvas(event):
     global canvas
     canvas.delete("all")
+
+    undone_lines = []
     lines_drawn = []
+    
+
 
 def _adjust_pencil_size(event):
     global pencil_size
@@ -79,10 +84,13 @@ def _set_color(color):
 def _undo_last_line(event):
     global canvas, lines_drawn
     if lines_drawn:
-        for i in range(10):
-            line_id = lines_drawn.pop()
+        last_line_group = lines_drawn.pop()
+        for line_id in last_line_group:
             if line_id:
                 canvas.delete(line_id)
+    
+    print(lines_drawn)
+        
 
 #--- Creating Interface ---#
 
