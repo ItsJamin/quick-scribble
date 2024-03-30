@@ -1,7 +1,10 @@
 import tkinter as tk
+from tkcolorpicker import askcolor
+
+# TODO: Saving and inserting images, exporting to exe
 
 # Drawing Variables
-pencil_size = 4
+pencil_size = 8
 pencil_color = "black"
 previous_point, current_point = [0,0],[0,0]
 
@@ -15,7 +18,7 @@ resize_after_id = None
 alpha_values = [0.4, 0.9, 1.0]
 current_alpha_index = 1
 lines_drawn = []
-undone_lines = []
+
 
 def _stop_draw(event):
     global previous_point
@@ -56,18 +59,14 @@ def _toggle_alpha(event):
 def _clear_canvas(event):
     global canvas
     canvas.delete("all")
-
-    undone_lines = []
     lines_drawn = []
-    
-
 
 def _adjust_pencil_size(event):
     global pencil_size
     if event.delta > 0:  # Scroll Up
-        pencil_size += 1
+        pencil_size += 2
     elif event.delta < 0:  # Scroll Down
-        pencil_size = max(4, pencil_size - 1)  # Ensure size is at least 1
+        pencil_size = max(4, pencil_size - 2)  # Ensure size is at least 1
 
 def _mouse_motion(event):
     canvas.delete("cursor")
@@ -75,11 +74,11 @@ def _mouse_motion(event):
     # Draw new cursor circle
     x, y = event.x, event.y
     canvas.create_oval(x - pencil_size/2, y - pencil_size/2, x + pencil_size/2, y + pencil_size/2,
-                       fill=pencil_color, width=2, tags="cursor")
+                       fill=pencil_color, outline="", width=2, tags="cursor")
 
 def _set_color(color):
     global pencil_color
-    pencil_color = color    
+    pencil_color = color
 
 def _undo_last_line(event):
     global canvas, lines_drawn
@@ -88,9 +87,12 @@ def _undo_last_line(event):
         for line_id in last_line_group:
             if line_id:
                 canvas.delete(line_id)
-    
-    print(lines_drawn)
-        
+
+def _choose_color():
+    global pencil_color
+    color = askcolor()
+    if color:
+        pencil_color = color[1]
 
 #--- Creating Interface ---#
 
